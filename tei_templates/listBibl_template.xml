@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml"
+	schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+      <fileDesc>
+         <titleStmt>
+            <title>Manuscripta: Index Literature</title>
+         </titleStmt>
+         <publicationStmt>
+            <p>Publication Information</p>
+         </publicationStmt>
+         <sourceDesc>
+            <p>Information about the source</p>
+         </sourceDesc>
+      </fileDesc>
+  </teiHeader>
+  <text>
+      <body>
+         <listBibl>           
+            <biblStruct type="literature-type" xml:id="literature-id" xml:lang="">
+               <monogr>
+                  <title level="m">[literature-title]</title>
+                  <title type="short">[literature-short_title]</title>
+                  <editor><forename>Tony</forename><surname>Bernhardt</surname></editor>
+                  <imprint>
+                     <publisher></publisher>
+                     <date>[literature-year]</date>
+                     <note>[literature-comment]</note>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+            <biblStruct type="literature-type" xml:id="literature-id-">
+               <analytic>
+                  <title level="a">[literature-title]</title>
+                  <title type="short">[literature-short_title]</title>
+                  <author><forename>Elaine</forename><surname>Treharne</surname></author>
+               </analytic>
+               <monogr>
+                  <title level="j">postmedieval: a journal of medieval cultural studies</title>
+                  <idno type="ISSN">2040-5979</idno>
+                  <imprint>
+                     <biblScope unit="volume">4</biblScope>
+                     <biblScope unit="issue">4</biblScope>
+                     <biblScope unit="page">465-478</biblScope>
+                     <date>2013</date>
+                     <note type="url">https://doi.org/10.1057/pmed.2013.36</note>
+                  </imprint>
+               </monogr>
+            </biblStruct>
+         </listBibl>
+      </body>
+  </text>
+</TEI>

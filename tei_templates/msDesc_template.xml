@@ -1,0 +1,311 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://diglib.hab.de/rules/schema/mss/v1.0/cataloguing.xsd"
+    version="5" xml:lang="deu">
+    
+<!--    ######## references to the SQL tables in @ref first part for the table,  ######
+        ######## second part for the field, e.g. manuscripts-id points to table 'manuscripts', field 'id'   ########
+        ###################-->
+    <teiHeader>
+        <fileDesc>
+            <titleStmt>
+                <title>Beschreibung von Cod. 20</title>
+                <respStmt>
+                    <resp>Beschrieben durch </resp>
+                    <name type="person"></name>
+                </respStmt>
+            </titleStmt>
+            <editionStmt>
+                <edition>Digitale Ausgabe nach TEI P5</edition>
+                <respStmt>
+                    <resp>TEI-P5 konforme Kodierung durch </resp>
+                    <name type="person"></name>
+                    <name type="org">Österreichische Akademie der Wissenschaften</name>
+                </respStmt>
+            </editionStmt>
+            <publicationStmt>
+                <publisher>
+                    <name type="org">Österreichische Akademie der Wissenschaften</name>
+                    <ptr target="www.oeaw.ac.at"/>
+                </publisher>
+                <date when="2025" type="issued">2025</date>
+                <distributor></distributor>
+                <availability status="restricted">
+                    <licence target="http://creativecommons.org/licenses/by-sa/3.0/de/" notBefore="2013-03-01">
+                        <p>Dieses Dokument steht unter einer Creative Commons Namensnennung-Weitergabe unter gleichen Bedingungen 3.0 Österreich Lizenz (CC BY-SA 3.0 AT).</p>
+                        <p> (<ref target="https://creativecommons.org/licenses/by-sa/3.0/at/">Copyright Information</ref>)</p>
+                    </licence>
+                </availability>
+                <pubPlace>
+                    <!--<ptr type="purl" target="http://"/>-->
+                </pubPlace>
+            </publicationStmt>
+            <sourceDesc>
+                <p>
+                    <bibl><abbr>Haidinger 1983</abbr></bibl> mit Addenda und Corrigenda IMAFO, ÖAW.
+                </p>
+            </sourceDesc>
+        </fileDesc>
+        <!--<encodingDesc>
+           One could use classDecl for the ENUM fields - but it would be easier and cleaner to reference to external SKOS documents
+            <classDecl>
+                <taxonomy xml:id="decoration">
+                    <category xml:id="illuminiert">
+                        <catDesc>die hs ist illuminiert</catDesc>
+                    </category>
+                    <category xml:id="initialen">
+                        <catDesc></catDesc>
+                            <category xml:id="rankeninitialen">
+                                <catDesc></catDesc>
+                            </category>
+                            <category xml:id="figurliche_buchschmuck">
+                                <catDesc></catDesc>
+                            </category>
+                    </category>
+                </taxonomy>
+                <taxonomy xml:id="binding">
+                    <category xml:id="gotisch">
+                        <catDesc>gotischer Einband</catDesc>
+                    </category>
+                    <category xml:id="blindstempel">
+                        <catDesc>der Einband hat Blindstempel</catDesc>
+                    </category>
+                </taxonomy>
+            </classDecl>
+        </encodingDesc>-->
+    </teiHeader>
+    <text>
+        <body>
+            <msDesc xml:id="manuscripts-id" xml:lang="deu">
+                <msIdentifier>
+                    <settlement ref="#institution-place_id">[places-name]Klosterneuburg</settlement>
+                    <repository ref="#manuscripts-collection_id">[collections-name]Stiftsbibliothek</repository>
+                    <idno sortKey="manuscript-code">[manuscript-shelfmark]Cod. 20</idno>
+                    <altIdentifier xml:id="olims-id" type="former">
+                        <repository ref="olims-attribution_id"></repository>
+                        <idno>[olims-signature]</idno>
+                        <note>[olims-comment]</note>
+                    </altIdentifier>
+                </msIdentifier>
+                <head>
+                    <title>[manuscript-title]Augustinus</title>
+                    <note type="caption"><!--is there some caption or should one patch from different elements? Perg. ## Bl. ##×##. <origPlace></origPlace>, <origDate></origDate>--></note>
+                </head>
+                
+<!--       Every manuscript has at least one msPart and the content (text,initia) go to the specific msPart. Right? -->
+                <physDesc>                   
+                    <objectDesc form="codex"> <!-- @form = [manuscript-type]-->
+                        <supportDesc material="perg"><!-- @material = [material-type]-->
+                            <support>
+                                <material>[material-type]</material>
+                            </support>
+                            <extent>
+                                <measure type="leavesCount" quantity="1"></measure>
+                                <dimensions type="fragment" unit="mm" rend="circa">
+                                    <dim>[manuscript-format]</dim>
+                                    <height>[dimensions-length]</height>
+                                    <width>[dimensions-width]</width>
+                                </dimensions>
+                                <note>[dimensions-comment]</note>
+                            </extent>
+                            <collation> [manuscripts-codicological_description]
+                                 <!--Beispiel für Lagen: I + 8.IV<hi rend="sup">128</hi>-->                                 
+                            </collation>
+                        </supportDesc>
+                        <!--  ######   Don't see where to get data on layout ######
+                            <layoutDesc>
+                                <layout columns="1" writtenLines="39" > <!-\-   Schriftspiegel / Schriftraum inkl. -\->
+                                    <dimensions type="written" unit="mm" rend="circa">
+                                        <height></height>
+                                        <width></width>
+                                    </dimensions> 
+                                    <p>    <!-\-   Info zu Linierung inkl. Schema.  Zeilen Zahl. Spaltenzahl.  -\->  </p>                          
+                                </layout>                                
+                            </layoutDesc>-->
+                    </objectDesc>
+                    
+                    <scriptDesc>
+                        <scriptNote>
+           <!-- ####### from table 'person_attributions' model to be used in relavant TEI Elements (not only in scriptDesc) -->
+                            <listRelation>
+                                <relation xml:id="person_attributions-id" name="person_attributions-role" active="person_attributions-person_id" cert="low"> <!--    @cert="low" or "high" reading the boolean [person_attributions-is_certain]-->
+                                    <desc>[person_attributions-comment]</desc>
+                                </relation>
+                            </listRelation>
+                        </scriptNote>
+                    </scriptDesc>                    
+             <!--    #### table 'bindings' ####            -->  
+                    <bindingDesc xml:id="bindings-id">
+                        <binding notBefore="1441" notAfter="1460"><!--  Datentyp ENUM - kontroliertes Vokabular können als <term> getaggt werden mit @ref @target zu externen SKOS -->
+                            <p><placeName ref="places">Klosterneuburg</placeName>
+                                <term ref="skosURI-style">[bindings-style]</term>
+                                <term ref="skosURI-special_features">[bindings-special_features]</term>
+                                <ref type="skosURI-bindings-workshop" target="bindings-workshop_id">[bookbinders-]</ref>
+                            </p>
+                            <condition >[bindings-is_resored]</condition><!--  ???? some if/else to read the boolean and write some template text "Restauriert/Nicht restauriert" OR add to the schema @restaured with true false possible values ? -->
+                            <decoNote xml:id="binding_decorations-id" type="binding_decorations-type">[binding_decorations-comment]</decoNote>
+                        </binding>
+                    </bindingDesc>
+                    <accMat>
+                        <p><!-- Read field 'bindings-has_fragments', if true add some template text : "Insitu Fragmente vorhanden" ???    --></p>
+                    </accMat>
+                </physDesc>
+                <history>
+                    <summary>
+                        <p>[manuscripts->historical_description]</p>
+<!-- #### read table 'group_manuscripts' with table 'groups' ####-->
+                        <listRelation>
+                            <relation xml:id="group_manuscripts-id" type="ms_group" name="group_manuscripts-group_id" mutual="#pull-all-mss-from-this-group #i-am-another-ms-from-this-group">
+                                <desc>
+                                    <name type="group" xml:id="groups-id">[groups-title]</name>
+                                    <listRef>
+                                        <ref type="group_ms" target="manuscripts-id">[manuscripts-shelfmark]</ref>
+                                    </listRef>
+                                    [groups-description]                                    
+                                </desc>
+                            </relation>
+                        </listRelation>
+                    </summary>
+                    <origin>
+                        <p/>
+                    </origin>
+<!--                    ### read table 'provenances + provenance_attributions -->
+                    <provenance xml:id="provenances-id" cert="low">
+                        <placeName ref="provenances-subject_id"><!--   get place-name  --></placeName><!--  according to the provenances-subject_type use placeName/persName/orgName  -->
+                        <date>[provenance_attributions-date]</date>
+                        <p>[provenances-comment]</p>
+                        <p>[provenance_attributions-comment]</p>
+                    </provenance>                    
+                    <acquisition>
+                        <p/>
+                    </acquisition>
+                </history>
+     <!--        #### table 'digital_copies' -->
+                <additional>
+                    <surrogates>
+                        <listBibl>
+                            <bibl type="digital-facsimile">
+                                <ref target="digital_copies-iiif_manifest_url">
+                                    <title>IIIF-Manifest</title>
+                                </ref>
+                            </bibl>
+                            <bibl type="thumbnail">
+                                <ref target="digital_copies-thumbnail_url">
+                                </ref>
+                            </bibl>
+                        </listBibl>
+                    </surrogates>             
+                    <listBibl>
+                        <bibl/>                            
+                    </listBibl>
+                </additional>
+<!--    ####  table 'parts'####            -->
+                <msPart xml:id="parts-id">
+                    <msIdentifier>
+                        <altIdentifier type="partial">
+                            <idno>[parts-title]</idno>
+                        </altIdentifier>
+                    </msIdentifier>
+    <!--  ### texts and text_witnesses are linked to parts not the whole ms so they come here ####  -->
+                    <msContents>
+                        <textLang mainLang="la">[languages-name]</textLang> <!--@mainLang = [languages-iso_code]-->
+                        <!--                    Table: initia. Get all initia with property manuscript_id === current part(!). For each map: -->
+                        <msItem xml:id="initia-id" n="[initia-position]">
+                            <locus rend="[page_numbers-unit]">[initia-folio]</locus>   
+                            <!-- maybe also <locusgrp><locus>1r</locus><locus>3v</locus></locusGrp> for cases where there are several folio entries: "1r, 3v"?                -->
+                            <!-- Table page_numbers - Ivana give up :) ... -->
+                            <title ref="#initia-text_id">[initia-title]</title><!--   #### the ref match the id in the index 'Texts'. -->                            
+                            <rubric></rubric> <!--Are there no rubrics?-->
+                            <incipit>[initia-incipit]</incipit>
+                            <explicit>[initia-explicit]</explicit>
+                            <finalRubric></finalRubric>
+                            <decoNote type="initial">
+                                <term></term>
+                            </decoNote>
+                            <listBibl>
+                                <bibl><abbr></abbr></bibl>
+                            </listBibl>
+                            <note>[initia-note]</note>  
+                            <!--  From table text_witnesses get entries which reference this text AND this ms (has the property text_id === current text_id and part_id)
+            check if this text_witness is in table 'text_transmissions' if so 
+                        for each entry make element <filiation> -> referencing the other witness (if the current msItem is the source take the target and vice versa)
+                        <ref> take the respective part and manuscript for display 
+                        use the  [text_witnesses-transmission_type] to set @type to filiation               
+        -->
+                            <filiation xml:id="text_tranismission-id" type="[text_witnesses-transmission_type]"> 
+                                <ref type="altMs" target="text_witnesses-part_id">[manuscripts-shelfmark + parts-title]: [text_witnesses-transmission_type]</ref>
+                                <note>[text_witnesses-comment]</note>  
+                                <note>[text_transmissions-comment]</note>
+                            </filiation> 
+                        </msItem>
+                         
+                    </msContents>
+                    <physDesc>                   
+                        <objectDesc form="fragment"> <!-- read table parts-is_fragment true => @form="fragment", false="fascicle" -->
+                            <supportDesc material="perg"><!-- @material = [material-type]-->
+                                <support>
+                                    <material>[material-type]</material>
+                                </support>
+                                <extent>
+                                    <measure type="leavesCount">[parts-folio]</measure>
+                                    <dimensions type="fragment" unit="mm" rend="circa">
+                                        <height>[dimensions-length]</height>
+                                        <width>[dimensions-width]</width>
+                                    </dimensions>
+                                    <note>[dimensions-comment]</note>
+                                </extent>
+                            </supportDesc>
+                  <!--  ######   Don't see where to get data on layout ######
+                            <layoutDesc>
+                                <layout columns="1" writtenLines="39" > <!-\-   Schriftspiegel / Schriftraum inkl. -\->
+                                    <dimensions type="written" unit="mm" rend="circa">
+                                        <height></height>
+                                        <width></width>
+                                    </dimensions> 
+                                    <p>    <!-\-   Info zu Linierung inkl. Schema.  Zeilen Zahl. Spaltenzahl.  -\->  </p>                          
+                                </layout>                                
+                            </layoutDesc>-->
+                        </objectDesc>
+                        
+                 <!--  ######   Table 'scripts' ###### -->       
+                        <scriptDesc xml:id="scripts-id">
+                            <scriptNote script="carolmin"><!-- @script = [scripts-script_type]-->
+                                <p><term ref="#SKOS-URI-script_type">[scripts-script_type]</term>.</p> <!--  Schriftarten ist ein kontroliertes Vokabular; können als <term> getaggt werden, und weiter zu externen SKOS oder hier in TEI-Header <classDecl> -> <taxonomy> -> <category> referenziert werden. -->
+                                <note>[scripts-comment</note>
+                                <!-- from table 'person_attributions' model to be used in relavant TEI Elements (not only in scriptDesc) -->
+                                <listRelation>
+                                    <relation xml:id="person_attributions-id1" name="person_attributions-role" active="person_attributions-person_id" cert="low"> <!--    @cert="low" or "high" reading the boolean [person_attributions-is_certain]-->
+                                        <desc>[person_attributions-comment]</desc>
+                                    </relation>
+                                </listRelation>
+                            </scriptNote>
+                        </scriptDesc>
+                        <musicNotation>
+                            [scripts-notation_type]
+                        </musicNotation>
+                        <decoDesc xml:id="book_decorations-id">                       
+                            <decoNote type="book_decorations-type">[book_decorations-comment]</decoNote>                       
+                        </decoDesc>
+                        <additions>
+                            <!--   ###### read the booleans from table scripts has_marginali, has_glosses and has_secret_Script , write template text "Enthält marginalia/glossen/geheimschriften" -->
+                            Enthält <term ref="gloss">Glossen</term> 
+                        </additions>                      
+                       
+                    </physDesc>
+                    <history>
+                       
+                 <!--         ###  table 'provenances + provenance_attributions -->
+                        <provenance xml:id="provenances-id1" cert="low">
+                            <placeName ref="provenances-subject_id"><!--   get place-name  --></placeName><!--  according to the provenances-subject_type use placeName/persName/orgName  -->
+                            <date>[provenance_attributions-date]</date>
+                            <p>[provenances-comment]</p>
+                            <p>[provenance_attributions-comment]</p>
+                        </provenance>                    
+                        <acquisition>
+                            <p/>
+                        </acquisition>
+                    </history>
+                </msPart>
+            </msDesc>
+        </body>
+    </text>
+</TEI>
