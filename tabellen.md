@@ -46,8 +46,8 @@
 | id                | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                                      | x                                                       |
 | text_id           | BIGINT UNSIGNED                | INDEX   | texts        | Verweis auf das überlieferte Werk                                    | x                                                       |
 | part_id           | BIGINT UNSIGNED                | INDEX   | parts        | Verknüpfung zum entsprechenden Handschriftenteil                     | msContents->msItem->filiation->ref @type"altMs" @target |
-| transmission_type | ENUM                           | –       | –            | Art der Überlieferung: Abschrift, Bearbeitung, Auszug oder Urfassung | msContents->msItem->filiation @type                     |
-| comment           | TEXT                           | –       | –            | Freitextkommentar zur Überlieferung                                  | msContents->msItem->filiation->note                     |
+| position          | INT                            | INDEX   | -            | Reihenfolge innerhalb der Handschrift                                | x                                                       |
+| folio             | VARCHAR(255)                   | –       | –            | Seiten- oder Blattangabe (z.B. „24r–25v“)                            | x                                                       |
 | created_at        | DATETIME                       | –       | –            | Zeitpunkt der Erstellung                                             | x                                                       |
 | deleted_at        | DATETIME                       | INDEX   | –            | Soft delete (Zeitpunkt der Löschung)                                 | x                                                       |
 
@@ -56,7 +56,8 @@
 | Feldname      | SQL-Datentyp                   | Index   | Referenziert | Kommentar                                            | TEI-msDesc-msPart-msContents-msItem |
 | ------------- | ------------------------------ | ------- | ------------ | ---------------------------------------------------- | ----------------------------------- |
 | id            | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                      | msItem @xml:id                      |
-| manuscript_id | BIGINT UNSIGNED                | INDEX   | parts        | Verknüpfung zur Handschrift                          | x                                   |
+| manuscript_id | BIGINT UNSIGNED                | INDEX   | manuscripts  | Verknüpfung zur Handschrift                          | x                                   |
+| part_id       | BIGINT UNSIGNED                | INDEX   | parts        | Verknüpfung zum Handschriftenteil                    | x                                   |
 | text_id       | BIGINT UNSIGNED                | INDEX   | texts        | Optionaler Verweis auf zugeordnetes Werk             | msItem->title @ref                  |
 | position      | INT                            | INDEX   | -            | Reihenfolge innerhalb der Handschrift                | msItem @n                           |
 | incipit       | TEXT                           | –       | –            | Beginn des Textabschnitts                            | msItem->incipit                     |
@@ -74,12 +75,22 @@
 | id               | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                             | @xml:id                                                      |
 | manuscript_id    | BIGINT UNSIGNED                | INDEX   | manuscripts  | Verknüpfte Handschrift                      |                                                              |
 | style            | ENUM                           | –       | –            | Stil des Einbands                           | bindingDesc->binding->p->term @style                         |
-| special_features | ENUM                           | –       | –            | Besondere Merkmale des Einbands             | bindingDesc->binding->p->term @special_features              |
 | is_restored      | BOOLEAN                        | –       | –            | Kennzeichnung als restaurierter Einband     | bindingDesc->binding->conditon->template text                |
 | has_fragments    | BOOLEAN                        | –       | –            | Gibt an, ob Einbandfragmente enthalten sind | physDesc->accMat->template text                              |
 | workshop_id      | BIGINT UNSIGNED                | INDEX   | bookbinders  | Verknüpfung zur Buchbinderwerkstatt         | bindingDesc->binding->p->ref @type="binding_workshop" target |
 | created_at       | DATETIME                       | –       | –            | Zeitpunkt der Erstellung                    |                                                              |
 | deleted_at       | DATETIME                       | INDEX   | –            | Soft delete (Zeitpunkt der Löschung)        |                                                              |
+
+## binding_features
+
+| Feldname   | SQL-Datentyp                   | Index   | Referenziert | Kommentar                                      | TEI-msDesc-physDesc-bindingDesc                              |
+| ---------- | ------------------------------ | ------- | ------------ | ---------------------------------------------- | ------------------------------------------------------------ |
+| id         | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                | bindingDesc->binding->p->term @special_features              |
+| binding_id | BIGINT UNSIGNED                | INDEX   | bindings     | Verknüpfung zum Einband                        |                                                              |
+| type       | ENUM                           | –       | –            | Typ des Merkmals (z. B. Schließen, Beschläge)  |                                                              |
+| comment    | TEXT                           | –       | –            | Optionaler Freitextkommentar                   |                                                              |
+| created_at | DATETIME                       | –       | –            | Zeitpunkt der Erstellung                       |                                                              |
+| deleted_at | DATETIME                       | INDEX   | –            | Soft delete (Zeitpunkt der Löschung)           |                                                              |
 
 ## digital_copies
 
@@ -129,6 +140,7 @@
 | width          | SMALLINT UNSIGNED              | –       | –            | Breite (in mm)                                       | physDesc->objectDesc->supportDesc->extent->dimensions->width           |
 | is_approximate | BOOLEAN                        | –       | –            | Gibt an, ob es sich um eine ungefähre Angabe handelt | physDesc->objectDesc->supportDesc->extent->dimensions @rend="circa"    |
 | is_fragment    | BOOLEAN                        | –       | –            | Gibt an, ob sich die Maße auf ein Fragment beziehen  | physDesc->objectDesc->supportDesc->extent->dimensions @type="fragment" |
+| position       | INT                            | INDEX   | -            | Reihenfolge in der Auflistung                        |                                                                        |
 | comment        | TEXT                           | –       | –            | Optionaler Freitextkommentar                         | physDesc->objectDesc->supportDesc->extent->note                        |
 | created_at     | DATETIME                       | –       | –            | Zeitpunkt der Erstellung                             |                                                                        |
 | deleted_at     | DATETIME                       | INDEX   | –            | Soft delete (Zeitpunkt der Löschung)                 |                                                                        |
@@ -150,8 +162,8 @@
 | ----------------- | ------------------------------ | ------- | ------------ | ------------------------------------------------------------------- | ------------------------------------------------------- |
 | id                | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                                     | scriptDesc @xml:id                                      |
 | part_id           | BIGINT UNSIGNED                | INDEX   | parts        | Verknüpfung zum kodikologischen Teil                                |                                                         |
-| script_type       | ENUM                           | –       | –            | Schrifttyp (Enum: z.B. Textualis, Bastarda, Capitalis)              | scritDesc->scriptNote @script and ScriptNote->term @ref |
-| notation_type     | ENUM                           | –       | –            | Notationstyp (Enum: z.B. Neumen, Quadratnotation, Mensuralnotation) | musicNotation                                           |
+| script            | ENUM                           | –       | –            | Schrifttyp (Enum: z.B. Textualis, Bastarda, Capitalis)              | scritDesc->scriptNote @script and ScriptNote->term @ref |
+| notation          | ENUM                           | –       | –            | Notationstyp (Enum: z.B. Neumen, Quadratnotation, Mensuralnotation) | musicNotation                                           |
 | has_marginalia    | BOOLEAN                        | –       | –            | Gibt an, ob Marginalien vorhanden sind                              | additions - template text for true values element term  |
 | has_glosses       | BOOLEAN                        | –       | –            | Gibt an, ob Glossen vorhanden sind                                  | additions - template text for true values element term  |
 | has_secret_script | BOOLEAN                        | –       | –            | Gibt an, ob Geheimschrift verwendet wurde                           | additions - template text for true values element term  |
@@ -172,14 +184,15 @@
 
 ## text_transmissions
 
-| Feldname   | SQL-Datentyp                   | Index   | Referenziert   | Kommentar                                                              | TEI->msContents->msItem   |
-| ---------- | ------------------------------ | ------- | -------------- | ---------------------------------------------------------------------- | ------------------------- |
-| id         | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –              | Primärschlüssel                                                        | msItem->filiation @xml:id |
-| source_id  | BIGINT UNSIGNED                | INDEX   | text_witnesses | Verweis auf die zugrundeliegende Textüberlieferung (Vorlage)           |                           |
-| target_id  | BIGINT UNSIGNED                | INDEX   | text_witnesses | Verweis auf die abschreibende oder abhängige Textüberlieferung         |                           |
-| comment    | TEXT                           | –       | –              | Kommentar zur Art der Abhängigkeit, Unsicherheiten oder Fragmentstatus | msItem->filiation->note   |
-| created_at | DATETIME                       | –       | –              | Zeitpunkt der Erstellung                                               |                           |
-| deleted_at | DATETIME                       | INDEX   | –              | Soft delete (Zeitpunkt der Löschung)                                   |                           |
+| Feldname          | SQL-Datentyp                   | Index   | Referenziert   | Kommentar                                                              | TEI->msContents->msItem             |
+| ----------------- | ------------------------------ | ------- | -------------- | ---------------------------------------------------------------------- | ----------------------------------- |
+| id                | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –              | Primärschlüssel                                                        | msItem->filiation @xml:id           |
+| source_id         | BIGINT UNSIGNED                | INDEX   | text_witnesses | Verweis auf die zugrundeliegende Textüberlieferung (Vorlage)           |                                     |
+| target_id         | BIGINT UNSIGNED                | INDEX   | text_witnesses | Verweis auf die abschreibende oder abhängige Textüberlieferung         |                                     |
+| transmission_type | ENUM                           | –       | –              | Art der Überlieferung: Abschrift, Bearbeitung, Auszug oder Urfassung   | msItem->filiation @type             |
+| comment           | TEXT                           | –       | –              | Kommentar zur Art der Abhängigkeit, Unsicherheiten oder Fragmentstatus | msItem->filiation->note             |
+| created_at        | DATETIME                       | –       | –              | Zeitpunkt der Erstellung                                               |                                     |
+| deleted_at        | DATETIME                       | INDEX   | –              | Soft delete (Zeitpunkt der Löschung)                                   |                                     |
 
 ## bookbinders
 
@@ -241,7 +254,7 @@
 | id                | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                                         | provenance @xml:id              |
 | attributable_id   | BIGINT UNSIGNED                | INDEX   | –            | ID des verknüpften Objekts (z.B. Handschrift, Teil)                     |                                 |
 | attributable_type | VARCHAR(255)                   | INDEX   | –            | Typ des verknüpften Objekts (z.B. `manuscript`, `part`)                 |                                 |
-| logic             | ENUM                           | –       | –            | Verknüpfung mehrerer Provenienzstellen als kombinierend oder alternativ | ?                               |
+| logic             | ENUM                           | –       | –            | Verknüpfung mehrerer Provenienzstellen als kombinierend oder alternativ |                                 |
 | comment           | TEXT                           | –       | –            | Freitextkommentar oder Beleg zur Zuordnung                              | provenance->p                   |
 | date_id           | BIGINT UNSIGNED                | –       | dates        | Optionale Verknüpfung zu einer zeitlichen Einordnung                    | provenance->date                |
 | created_at        | DATETIME                       | –       | –            | Zeitpunkt der Erstellung                                                |                                 |
@@ -253,7 +266,8 @@
 | ---------------- | ------------------------------ | ------- | ------------ | --------------------------------------------------------------------- | ----------------------------------------------------- |
 | id               | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                                       | @xml:id                                               |
 | manuscript_id    | BIGINT UNSIGNED                | INDEX   | manuscripts  | Verknüpfte Handschrift                                                |                                                       |
-| signature        | VARCHAR(255)                   | –       | –            | Die überlieferte (alte) Signatur der Handschrift                      | altIdentifier->idno                                   |
+| shelfmark        | VARCHAR(255)                   | –       | –            | Die überlieferte (alte) Signatur der Handschrift                      | altIdentifier->idno                                   |
+| position         | INT                            | INDEX   | -            | Reihenfolge in der Auflistung                                         |                                                       |
 | comment          | TEXT                           | –       | –            | Optionaler Kommentar zur Einordnung, Quelle oder historischen Kontext | altIdentifier->note                                   |
 | attribution_id   | BIGINT UNSIGNED                | INDEX   | –            | ID der verknüpften Institution oder Sammlung                          | altIdentifier->repository                             |
 | attribution_type | VARCHAR(255)                   | INDEX   | –            | Typ der verknüpften Quelle (z.B. `institution`, `collection`)         |                                                       |
@@ -356,11 +370,12 @@
 
 | Feldname      | SQL-Datentyp                   | Index   | Referenziert | Kommentar                                             | TEI-msDesc-msContents->textLang |
 | ------------- | ------------------------------ | ------- | ------------ | ----------------------------------------------------- | ------------------------------- |
-| id            | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                       |
-| manuscript_id | BIGINT UNSIGNED                | INDEX   | manuscripts  | Verknüpfte Handschrift                                |
-| language_id   | BIGINT UNSIGNED                | INDEX   | languages    | Zugeordnete Sprache aus der zentralen Sprachentabelle |
-| created_at    | DATETIME                       | –       | –            | Zeitpunkt der Erstellung                              |
-| deleted_at    | DATETIME                       | INDEX   | –            | Soft delete (Zeitpunkt der Löschung)                  |
+| id            | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                       |                                 |
+| manuscript_id | BIGINT UNSIGNED                | INDEX   | manuscripts  | Verknüpfte Handschrift                                |                                 |
+| language_id   | BIGINT UNSIGNED                | INDEX   | languages    | Zugeordnete Sprache aus der zentralen Sprachentabelle |                                 |
+| position      | INT                            | INDEX   | -            | Reihenfolge in der Auflistung                         |                                 |
+| created_at    | DATETIME                       | –       | –            | Zeitpunkt der Erstellung                              |                                 |
+| deleted_at    | DATETIME                       | INDEX   | –            | Soft delete (Zeitpunkt der Löschung)                  |                                 |
 
 ## language_literature
 
@@ -369,6 +384,7 @@
 | id            | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                         |
 | literature_id | BIGINT UNSIGNED                | INDEX   | literatures  | Verknüpfte Publikation (Literatur- oder Katalogeintrag) |
 | language_id   | BIGINT UNSIGNED                | INDEX   | languages    | Zugeordnete Sprache aus der zentralen Sprachentabelle   |
+| position      | INT                            | INDEX   | -            | Reihenfolge in der Auflistung                           |
 | created_at    | DATETIME                       | –       | –            | Zeitpunkt der Erstellung                                |
 | deleted_at    | DATETIME                       | INDEX   | –            | Soft delete (Zeitpunkt der Löschung)                    |
 
@@ -376,14 +392,15 @@
 
 | Feldname      | SQL-Datentyp                   | Index   | Referenziert | Kommentar                                                                 | TEI-msDesc->additional->listBibl |
 | ------------- | ------------------------------ | ------- | ------------ | ------------------------------------------------------------------------- | -------------------------------- |
-| id            | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                                           |
-| manuscript_id | BIGINT UNSIGNED                | INDEX   | manuscripts  | Verknüpfte Handschrift                                                    |
-| literature_id | BIGINT UNSIGNED                | INDEX   | literatures  | Verknüpfte Publikation                                                    |
-| pages         | VARCHAR(50)                    | –       | –            | Seitenzahl oder Seitenbereich des Bezugs                                  |
-| external_link | TEXT                           | –       | –            | Optionaler Direktlink zur digitalen Quelle (z.B. PDF, Online-Edition)     |
-| comment       | TEXT                           | –       | –            | Optionaler Freitextkommentar zur Art des Bezugs oder spezifischen Stellen |
-| created_at    | DATETIME                       | –       | –            | Zeitpunkt der Erstellung                                                  |
-| deleted_at    | DATETIME                       | INDEX   | –            | Soft delete (Zeitpunkt der Löschung)                                      |
+| id            | BIGINT UNSIGNED AUTO_INCREMENT | PRIMARY | –            | Primärschlüssel                                                           |                                  |
+| manuscript_id | BIGINT UNSIGNED                | INDEX   | manuscripts  | Verknüpfte Handschrift                                                    |                                  |
+| literature_id | BIGINT UNSIGNED                | INDEX   | literatures  | Verknüpfte Publikation                                                    |                                  |
+| position      | INT                            | INDEX   | -            | Reihenfolge in der Bibliographie                                          |                                  |
+| pages         | VARCHAR(50)                    | –       | –            | Seitenzahl oder Seitenbereich des Bezugs                                  |                                  |
+| external_link | TEXT                           | –       | –            | Optionaler Direktlink zur digitalen Quelle (z.B. PDF, Online-Edition)     |                                  |
+| comment       | TEXT                           | –       | –            | Optionaler Freitextkommentar zur Art des Bezugs oder spezifischen Stellen |                                  |
+| created_at    | DATETIME                       | –       | –            | Zeitpunkt der Erstellung                                                  |                                  |
+| deleted_at    | DATETIME                       | INDEX   | –            | Soft delete (Zeitpunkt der Löschung)                                      |                                  |
 
 ## group_manuscripts
 

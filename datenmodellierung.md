@@ -191,7 +191,7 @@ Einbandschmuck kann vielfältig sein und wird daher in einer separaten 1:n-Bezie
 
 #### Besonderheiten
 
-Besondere Merkmale des Einbands werden ebenfalls über ein Enum-Feld erfasst. So lassen sich auch seltene oder ungewöhnliche Eigenschaften systematisch dokumentieren und auswerten.
+Ausstattungsmerkmale wie Schließen, Beschläge oder Lederelemente werden in einer eigenen Tabelle `binding_features` verwaltet. Diese steht in einer 1:n-Beziehung zum jeweiligen Einband und erlaubt eine strukturierte Kategorisierung sowie optionale Kommentierung einzelner Merkmale.
 
 #### Restauriert
 
@@ -299,7 +299,13 @@ Die `bookbinders` Tabelle bildet Buchbinderwerkstätten als eigenständigen Date
 
 ### Einbandschmuck
 
-Der Einbandschmuck wird in einer eigenen Tabelle erfasst, die in einer 1:n-Beziehung zum jeweiligen Einband steht. Damit kann ein Einband mit einer beliebigen Anzahl an Schmuckmerkmalen versehen werden. Die jeweilige Ausprägung des Schmucks – etwa Blindstempel, Streicheisenlinien, Supralibros oder Golddruck – wird über ein Enum-Feld festgelegt.
+Der Einbandschmuck wird in der Tabelle `binding_decorations` erfasst, die in einer 1:n-Beziehung zum jeweiligen Einband steht. Damit kann ein Einband mit einer beliebigen Anzahl an Schmuckmerkmalen versehen werden. Die jeweilige Ausprägung des Schmucks – etwa Blindstempel, Streicheisenlinien, Supralibros oder Golddruck – wird über ein Enum-Feld festgelegt.
+
+### Einbandmerkmale
+
+Einbände mittelalterlicher Handschriften weisen häufig zusätzliche Merkmale auf, die über den allgemeinen Stil oder die Ausstattung hinausgehen. Zu diesen zählen insbesondere funktionale oder dekorative Elemente wie Schließen, Beschläge oder Eckverstärkungen, die nicht primär unter den Einbandschmuck fallen, aber dennoch für die materielle Beschreibung, Datierung und Provenienz von Bedeutung sein können.
+
+Um diesen Merkmalen im Datenmodell strukturiert Rechnung zu tragen, wurde eine eigene Tabelle `binding_features` eingeführt. Sie steht in einer 1:n-Beziehung zur Einbandtabelle `bindings` und ermöglicht die Zuweisung beliebig vieler Merkmale zu einem einzelnen Einband.
 
 ## Zeitliche und räumliche Verortung
 
