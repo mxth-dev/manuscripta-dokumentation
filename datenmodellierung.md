@@ -42,7 +42,7 @@ Die Angaben zu Höhe und Breite einer Handschrift werden künftig nicht mehr dir
 
 #### Datierung
 
-Die bisherige Struktur der Datierungsangaben wird im Wesentlichen beibehalten, allerdings in eine eigene, zentral verwaltete Tabelle überführt, die unter dem Namen `dates` geführt wird. Diese Tabelle ist polymorph aufgebaut und kann flexibel mit unterschiedlichen Entitäten wie Handschriften, Handschriftenteilen, Einbänden oder Provenienzattributionen verknüpft werden. Sie erlaubt sowohl die Angabe von exakten Daten als auch von Zeitspannen (z.B. von–bis) und unterstützt verschiedene Darstellungsformen wie „um“, „nach“ oder „zwischen“. Zusätzlich kann über ein separates Boolean-Feld dokumentiert werden, ob eine Datierung explizit über eine Quelle (z.B. Kolophon) belegt ist. Jene Quellen können zudem über ein Kommentarfeld ausgewiesen werden.
+Die bisherige Struktur der Datierungsangaben wird im Wesentlichen beibehalten, allerdings in eine eigene, zentral verwaltete Tabelle überführt, die unter dem Namen [`dates`](tabellen.md#dates) geführt wird. Diese Tabelle ist polymorph aufgebaut und kann flexibel mit unterschiedlichen Entitäten wie Handschriften, Handschriftenteilen, Einbänden oder Provenienzattributionen verknüpft werden. Sie erlaubt sowohl die Angabe von exakten Daten als auch von Zeitspannen (z.B. von–bis) und unterstützt verschiedene Darstellungsformen wie „um“, „nach“ oder „zwischen“. Zusätzlich kann über ein separates Boolean-Feld dokumentiert werden, ob eine Datierung explizit über eine Quelle (z.B. Kolophon) belegt ist. Jene Quellen können zudem über ein Kommentarfeld ausgewiesen werden.
 
 #### Provenienzzuordnungen
 
@@ -58,21 +58,19 @@ Für Bearbeiter:innen und Benutzer:innen ergibt sich daraus keine Änderung im U
 
 #### Sprache
 
-Sprachangaben werden künftig nicht mehr in Form von abgekürzten Einzelbuchstaben gespeichert, sondern über eine eigene Zwischentabelle verwaltet. Diese Tabelle bildet eine n:m-Beziehung zwischen Handschriften und standardisierten Sprachangaben ab. Grundlage hierfür ist eine eigene Tabelle `languages`, die ISO-konforme Sprachcodes sowie Klartextbezeichnungen enthält.
+Sprachangaben werden über eine Zwischentabelle [`language_manuscript`](tabellen.md#language_manuscript) verwaltet. Diese Tabelle bildet eine n:m-Beziehung zwischen Handschriften und Spracheinträgen ab. Die Spracheinträge selbst werden über eine ID referenziert, die auf eine separate Sprachtabelle verweist (diese wird außerhalb des CSV-Exports verwaltet).
 
-Die Zwischentabelle ermöglicht die Verknüpfung einer Handschrift mit mehreren Spracheinträgen. Dadurch wird die bisherigen Zeichenkettenstruktur abgelöst.
-
-Für Benutzer:innen und Bearbeiter:innen ändert sich durch diese Normalisierung nichts im praktischen Umgang: Die Eingabe bleibt gewohnt einfach, die Anzeige klar strukturiert – die technische Umstellung dient primär der Transparenz, Nachvollziehbarkeit und Systematisierung im Hintergrund.
+Die Zwischentabelle ermöglicht die Verknüpfung einer Handschrift mit mehreren Spracheinträgen und löst damit die bisherige Zeichenkettenstruktur ab.
 
 #### Überlieferungsform
 
-Die Überlieferungsform einer Handschrift wird über ein kontrolliertes Vokabular gepflegt. Dieses Vokabular bleibt gegenüber der bisherigen Implementierung unverändert, wird jedoch technisch als Enum-Feld innerhalb der Datenbank umgesetzt.
+Die Überlieferungsform einer Handschrift wird über ein kontrolliertes Vokabular gepflegt. Dieses Vokabular bleibt gegenüber der bisherigen Implementierung unverändert, wird jedoch künftig als TEXT-Feld mit kontrollierter Werteliste gespeichert.
 
 #### Format
 
 Das physische Format einer Handschrift – etwa Quart, Oktav oder Folio – beschreibt die Faltung und das ursprüngliche Maß der Lagen und gehört zu den grundlegenden formalen Eigenschaften eines Codex. Diese Angabe wurde bereits bislang in strukturierter Form erfasst, jedoch über eine ID referenziert, die programmatisch aufgelöst und nicht in einer separaten Tabelle gepflegt wurde.
 
-In der neuen Struktur wird das Format als kontrolliertes Vokabular direkt innerhalb der Handschriftentabelle über ein Enum-Feld abgebildet.
+In der neuen Struktur wird das Format als kontrolliertes Vokabular direkt innerhalb der Handschriftentabelle über ein TEXT-Feld abgebildet.
 
 #### Olim-Signaturen
 
@@ -159,7 +157,7 @@ Ein Textdatensatz enthält mindestens einen Werktitel. Optional können außerde
 
 ### Textüberlieferungen
 
-Die Tabelle der Textüberlieferungen bildet die Verbindung zwischen einem Text, einer konkreten Handschrift und darin enthaltener Initien. In der Regel handelt es sich bei diesen Einträgen nicht um originale Werke, sondern um Abschriften. Um diesen Unterschied explizit zu erfassen, steht ein Boolean-Feld zur Verfügung, über das vermerkt werden kann, ob es sich bei der überlieferten Fassung um eine Erstfassung handelt.
+Die Tabelle der Textüberlieferungen ([`text_witnesses`](tabellen.md#text_witnesses)) bildet die Verbindung zwischen einem Text, einer konkreten Handschrift und darin enthaltener Initien. In der Regel handelt es sich bei diesen Einträgen nicht um originale Werke, sondern um Abschriften. Um diesen Unterschied explizit zu erfassen, steht ein Boolean-Feld zur Verfügung, über das vermerkt werden kann, ob es sich bei der überlieferten Fassung um eine Erstfassung handelt.
 
 Zusätzlich besteht die Möglichkeit, eine bekannte Vorlage der Abschrift zu verknüpfen – sofern diese ebenfalls in der Datenbank erfasst ist. Diese Verknüpfung erfolgt über eine eigene Abschriften-Tabelle, die zwei Textüberlieferungen miteinander in Beziehung setzt: die spätere Abschrift und ihre angenommene oder nachgewiesene Vorlage. Auf diese Weise lassen sich Überlieferungsnetzwerke und textgeschichtliche Abhängigkeiten systematisch abbilden, die bislang in der Struktur nicht darstellbar waren.
 
@@ -183,7 +181,7 @@ Zusätzlich besteht die Möglichkeit, eine oder mehrere Sprachen über eine eige
 
 #### Stil
 
-Die stilistische Einordnung eines Einbands erfolgt über ein standardisiertes Enum-Feld, das an die Stelle des bisherigen numerischen Codes tritt.
+Die stilistische Einordnung eines Einbands erfolgt über ein standardisiertes TEXT-Feld mit kontrolliertem Vokabular, das an die Stelle des bisherigen numerischen Codes tritt.
 
 #### Schmuck
 
@@ -191,7 +189,7 @@ Einbandschmuck kann vielfältig sein und wird daher in einer separaten 1:n-Bezie
 
 #### Besonderheiten
 
-Ausstattungsmerkmale wie Schließen, Beschläge oder Lederelemente werden in einer eigenen Tabelle `binding_features` verwaltet. Diese steht in einer 1:n-Beziehung zum jeweiligen Einband und erlaubt eine strukturierte Kategorisierung sowie optionale Kommentierung einzelner Merkmale.
+Ausstattungsmerkmale wie Schließen, Beschläge oder Lederelemente werden in einer eigenen Tabelle [`binding_features`](tabellen.md#binding_features) verwaltet. Diese steht in einer 1:n-Beziehung zum jeweiligen Einband und erlaubt eine strukturierte Kategorisierung sowie optionale Kommentierung einzelner Merkmale.
 
 #### Restauriert
 
@@ -237,7 +235,7 @@ Ein Eintrag umfasst folgende Informationen:
 - Anmerkungen: Freitextfeld für zusätzliche Angaben.
 - Publikationstyp: Ein Enum-Feld, das die Publikation einer Kategorie zuordnet, wie etwa “Katalog”, “Monographie” oder “Artikel”.
 
-Die bisherige Freitexterfassung der Sprachen wird durch eine normalisierte Lösung ersetzt: Die Sprachen werden künftig über eine Zwischentabelle mit der zentralen Sprachentabelle `languages` verknüpft.
+Die bisherige Freitexterfassung der Sprachen wird durch eine normalisierte Lösung ersetzt: Die Sprachen werden künftig über eine Zwischentabelle mit der zentralen Sprachentabelle [`languages`](tabellen.md#languages) verknüpft.
 
 ## Inhaltliche Merkmale und Erschließung
 
@@ -263,21 +261,21 @@ So kann beispielsweise der Eintrag „ca. 410/415x290/295“ aufgeschlüsselt we
 
 ### Material
 
-Die Tabelle `materials` erfasst Materialzuweisungen zu verschiedenen Entitäten (z.B. Handschriften oder deren Teile) über eine polymorphe Beziehung. Anstelle einer separaten Referenz auf eine eigenständige Materialdefinition wird die Materialart direkt in einem Enum-Feld type gespeichert, das gängige Beschreibstoffe wie Pergament oder Papier.
+Die Tabellen [`manuscript_material`](tabellen.md#manuscript_material) und [`part_material`](tabellen.md#part_material) erfassen Materialzuweisungen zu verschiedenen Entitäten (Handschriften oder deren Teile) über eine polymorphe Beziehung. Anstelle einer separaten Referenz auf eine eigenständige Materialdefinition wird die Materialart direkt in einem TEXT-Feld `type` mit kontrolliertem Vokabular gespeichert, das gängige Beschreibstoffe wie Pergament oder Papier umfasst.
 
 ### Schrift
 
 Die Schriftbeschreibungen erfassen paläographische Merkmale auf Ebene der kodikologischen Teile. Sie stehen in einer 1:n-Beziehung zu diesen Teilen, sodass ein Teil mehrere unterschiedliche Schriftbeschreibungen aufweisen kann – etwa bei einem Wechsel der Schreiber oder bei unterschiedlichen Schriftarten innerhalb desselben Abschnitts.
 
-Die bestehende Feldstruktur wird grundsätzlich beibehalten, jedoch technisch konsolidiert: Die bislang als numerische ID gespeicherten Angaben zu Schrifttyp und Notation werden künftig als kontrollierte Vokabulare (Enum-Felder) umgesetzt, wodurch sie klarer interpretierbar und direkt validierbar sind.
+Die bestehende Feldstruktur wird grundsätzlich beibehalten, jedoch technisch konsolidiert: Die bislang als numerische ID gespeicherten Angaben zu Schrifttyp und Notation werden künftig als kontrollierte Vokabulare (TEXT-Felder) umgesetzt, wodurch sie klarer interpretierbar und direkt validierbar sind.
 
-Bisher als Zahlen codierte Eigenschaften wie das Vorhandensein von Marginalien, Glossen oder Geheimschrift werden künftig als Boolean-Felder mit optionalem Zustand geführt. Die bisher verwendete Codierung „9“ für „nicht erfasst“ entfällt und wird durch null ersetzt, was dem Standard eines `nullable` Boolean-Felds entspricht. In der Benutzeroberfläche muss dies durch eine dreiwertige Auswahlmöglichkeit oder entsprechende Kennzeichnung berücksichtigt werden.
+Bisher als Zahlen codierte Eigenschaften wie das Vorhandensein von Marginalien, Glossen oder Geheimschrift werden künftig als BOOLEAN-Felder mit optionalem Zustand (nullable) geführt. Die bisher verwendete Codierung „9" für „nicht erfasst" entfällt und wird durch NULL ersetzt. In der Benutzeroberfläche muss dies durch eine dreiwertige Auswahlmöglichkeit oder entsprechende Kennzeichnung berücksichtigt werden.
 
 Zusätzlich ist eine optionale Verknüpfung mit einem Personendatensatz möglich – etwa zur Angabe eines bekannten oder vermuteten Schreibers. Unsicherheiten in der Zuschreibung können über ein entsprechendes Feld kenntlich gemacht werden.
 
 ### Ausstattung
 
-Die Tabelle zur Ausstattungskategorisierung dokumentiert, welche kunsthistorisch oder funktional relevanten Ausstattungselemente einem bestimmten Handschriftenteil zugeordnet sind. Die Einträge stehen jeweils in einer 1:n-Beziehung zu den kodikologischen Teilen. Die möglichen Kategorien werden über ein kontrolliertes Vokabular (Enum-Feld) definiert. So wird sichergestellt, dass die Erfassung einheitlich, auswertbar und erweiterbar bleibt.
+Die Tabelle [`book_decorations`](tabellen.md#book_decorations) dokumentiert, welche kunsthistorisch oder funktional relevanten Ausstattungselemente einem bestimmten Handschriftenteil zugeordnet sind. Die Einträge stehen jeweils in einer 1:n-Beziehung zu den kodikologischen Teilen. Die möglichen Kategorien werden über ein kontrolliertes Vokabular (TEXT-Feld `type`) definiert. So wird sichergestellt, dass die Erfassung einheitlich, auswertbar und erweiterbar bleibt.
 
 ### Abschriften
 
@@ -293,27 +291,27 @@ Jeder Eintrag in der Abschriften-Tabelle enthält:
 Die Zuordnung ist nicht zwangsläufig symmetrisch und kann auch mehrere Vorlagen für eine Abschrift oder umgekehrt mehrere Abschriften zu einer Vorlage erfassen.
 Diese Tabelle eröffnet neue Möglichkeiten zur Analyse von Werküberlieferungen, Schreibstuben, klösterlichen Netzwerken und Abschriftentraditionen innerhalb des Korpus.
 
-### Buchbinderwerkstatt 
+### Buchbinderwerkstatt
 
-Die `bookbinders` Tabelle bildet Buchbinderwerkstätten als eigenständigen Datentyp ab. Dies ermöglicht eine zweifache Anbindung: Zum einen kann eine Werkstatt mit einer übergeordneten Institution verknüpft werden, zum anderen wird durch die eigenständige Modellierung die Verlinkung mit externen Ressourcen, etwa der Einbanddatenbank der Staatsbibliothek zu Berlin, erleichtert. Neben jenen Verlinkungen umfasst die Tabelle die Bezeichnung der Werkstatt. Eine Datierung, etwa für den Tätigkeitszeitraum, kann optional verknüpft werden. 
+Die [`binding_workshops`](tabellen.md#binding_workshops) Tabelle bildet Buchbinderwerkstätten als eigenständigen Datentyp ab. Dies ermöglicht eine zweifache Anbindung: Zum einen kann eine Werkstatt mit einer übergeordneten Institution verknüpft werden (über die Tabelle [`binding_workshop_institution`](tabellen.md#binding_workshop_institution)), zum anderen wird durch die eigenständige Modellierung die Verlinkung mit externen Ressourcen, etwa der Einbanddatenbank der Staatsbibliothek zu Berlin, erleichtert (über das Feld `ebdb_id`). Neben jenen Verlinkungen umfasst die Tabelle die Bezeichnung der Werkstatt (`name`). Eine Datierung, etwa für den Tätigkeitszeitraum, kann optional verknüpft werden. 
 
 ### Einbandschmuck
 
-Der Einbandschmuck wird in der Tabelle `binding_decorations` erfasst, die in einer 1:n-Beziehung zum jeweiligen Einband steht. Damit kann ein Einband mit einer beliebigen Anzahl an Schmuckmerkmalen versehen werden. Die jeweilige Ausprägung des Schmucks – etwa Blindstempel, Streicheisenlinien, Supralibros oder Golddruck – wird über ein Enum-Feld festgelegt.
+Der Einbandschmuck wird in der Tabelle [`binding_decorations`](tabellen.md#binding_decorations) erfasst, die in einer 1:n-Beziehung zum jeweiligen Einband steht. Damit kann ein Einband mit einer beliebigen Anzahl an Schmuckmerkmalen versehen werden. Die jeweilige Ausprägung des Schmucks – etwa Blindstempel, Streicheisenlinien, Supralibros oder Golddruck – wird über ein TEXT-Feld `type` mit kontrolliertem Vokabular festgelegt.
 
 ### Einbandmerkmale
 
 Einbände mittelalterlicher Handschriften weisen häufig zusätzliche Merkmale auf, die über den allgemeinen Stil oder die Ausstattung hinausgehen. Zu diesen zählen insbesondere funktionale oder dekorative Elemente wie Schließen, Beschläge oder Eckverstärkungen, die nicht primär unter den Einbandschmuck fallen, aber dennoch für die materielle Beschreibung, Datierung und Provenienz von Bedeutung sein können.
 
-Um diesen Merkmalen im Datenmodell strukturiert Rechnung zu tragen, wurde eine eigene Tabelle `binding_features` eingeführt. Sie steht in einer 1:n-Beziehung zur Einbandtabelle `bindings` und ermöglicht die Zuweisung beliebig vieler Merkmale zu einem einzelnen Einband.
+Um diesen Merkmalen im Datenmodell strukturiert Rechnung zu tragen, wurde eine eigene Tabelle [`binding_features`](tabellen.md#binding_features) eingeführt. Sie steht in einer 1:n-Beziehung zur Einbandtabelle [`bindings`](tabellen.md#bindings) und ermöglicht die Zuweisung beliebig vieler Merkmale zu einem einzelnen Einband.
 
 ## Zeitliche und räumliche Verortung
 
 ### Datierungen
 
-Die Tabelle `dates` dient der flexiblen Erfassung zeitlicher Angaben, die sich auf unterschiedliche Objekte im System beziehen können – etwa auf Handschriften, Teile, Einbände oder Provenienzzuordnungen. Die bisherige Systematik der Datierung bleibt vollständig erhalten; es erfolgt keine inhaltliche Änderung, sondern lediglich eine Auslagerung der Datumsangaben in eine eigene Tabelle.
+Die Tabelle [`dates`](tabellen.md#dates) dient der flexiblen Erfassung zeitlicher Angaben, die sich auf unterschiedliche Objekte im System beziehen können – etwa auf Handschriften, Teile, Einbände oder Provenienzzuordnungen. Die bisherige Systematik der Datierung bleibt vollständig erhalten; es erfolgt keine inhaltliche Änderung, sondern lediglich eine Auslagerung der Datumsangaben in eine eigene Tabelle.
 
-Die bisherigen Felder für Anfang und Ende des Zeitraums sowie das zugehörige Datierungsformat werden übernommen. Die bisher verwendete ID für das Datierungsformat wird durch ein Enum-Feld ersetzt.
+Die bisherigen Felder für Anfang und Ende des Zeitraums sowie das zugehörige Datierungsformat werden übernommen. Die bisher verwendete ID für das Datierungsformat wird durch ein TEXT-Feld `format` mit kontrolliertem Vokabular ersetzt. Die Tabelle verwendet eine polymorphe Beziehung über die Felder `datable_type` und `datable_id`.
 
 ### Provenienzstellen
 
@@ -338,9 +336,9 @@ Beispielhafte Umsetzung: Zwei mögliche Vorbesitzer einer Handschrift – beispi
 
 ### Olim-Signaturen
 
-Die Tabelle `olims` dient der systematischen Erfassung alter Signaturen von Handschriften. Solche „Olim-Signaturen“ sind wichtige Hinweise zur Sammlungsgeschichte und Provenienz einer Handschrift.
+Die Tabelle [`olims`](tabellen.md#olims) dient der systematischen Erfassung alter Signaturen von Handschriften. Solche „Olim-Signaturen“ sind wichtige Hinweise zur Sammlungsgeschichte und Provenienz einer Handschrift.
 
-Ein Eintrag in der Tabelle `olims` enthält die eigentliche Signatur als Freitext sowie ein optionales Kommentarfeld zur Kontextualisierung oder für einen Quellennachweis. Zusätzlich kann eine Datierung verknüpft werden, die den Zeitraum der Gültigkeit oder des Auftretens dieser Signatur angibt.
+Ein Eintrag in der Tabelle [`olims`](tabellen.md#olims) enthält die eigentliche Signatur als Freitext sowie ein optionales Kommentarfeld zur Kontextualisierung oder für einen Quellennachweis. Zusätzlich kann eine Datierung verknüpft werden, die den Zeitraum der Gültigkeit oder des Auftretens dieser Signatur angibt.
 
 Die Verknüpfung zu einer Institution oder Sammlung erfolgt über eine polymorphe Beziehung. So kann nachvollzogen werden, aus welchem institutionellen Zusammenhang die frühere Signatur stammt.
 
@@ -348,18 +346,17 @@ Die Verknüpfung zu einer Institution oder Sammlung erfolgt über eine polymorph
 
 ### Personen
 
-Die neue Personen-Tabelle führt zwei bislang getrennt geführte Tabellen zusammen: Zum einen die Tabelle `aut`, die bisher für die Textzuordnung verwendet wurde und primär Autorennamen enthielt, zum anderen die Tabelle `personen`, die insbesondere für Buchmaler:innen und andere Rollen genutzt wurde. Beide Tabellen enthielten bereits GND-Nummern, wodurch in einem Großteil der Fälle eine automatisierte Zusammenführung der Datensätze möglich ist.
+Die Personen-Tabelle ([`people`](tabellen.md#people)) führt zwei bislang getrennt geführte Tabellen zusammen: Zum einen die Tabelle `aut`, die bisher für die Textzuordnung verwendet wurde und primär Autorennamen enthielt, zum anderen die Tabelle `personen`, die insbesondere für Buchmaler:innen und andere Rollen genutzt wurde. Beide Tabellen enthielten bereits GND-Nummern, wodurch in einem Großteil der Fälle eine automatisierte Zusammenführung der Datensätze möglich ist.
 
 Ziel dieser Vereinheitlichung ist es, alle natürlichen Personen, die im Zusammenhang mit einer Handschrift auftreten – sei es als Autor, Buchmaler, Schreiber, Vorbesitzer oder in einer anderen Funktion – in einer einzigen, strukturierten Tabelle zu erfassen.
 
 Ein Eintrag in der Personen-Tabelle umfasst folgende Felder:
-- Name: Der gebräuchliche oder bibliographisch relevante Name der Person.
-- GND-Nummer: Eine Verknüpfung zu einem Normdatensatz (falls vorhanden), die eine eindeutige Identifikation ermöglicht.
-- Biographische Angaben: Ein optionales Freitextfeld für Lebensdaten, Funktionen, Herkunft oder weitere kontextuelle Informationen.
+- `name`: Der gebräuchliche oder bibliographisch relevante Name der Person.
+- `gnd_number`: Eine Verknüpfung zu einem Normdatensatz (falls vorhanden), die eine eindeutige Identifikation ermöglicht.
 
 ### Sprachen
 
-Die Tabelle `languages` enthält die standardisierten Sprachangaben, auf die sich Zuordnungen zu Handschriften, Teilen oder anderen Entitäten beziehen. Ziel ist es, alle sprachbezogenen Angaben zentral, einheitlich und auswertbar zu speichern.
+Die Tabelle [`languages`](tabellen.md#languages) enthält die standardisierten Sprachangaben, auf die sich Zuordnungen zu Handschriften, Teilen oder anderen Entitäten beziehen. Ziel ist es, alle sprachbezogenen Angaben zentral, einheitlich und auswertbar zu speichern.
 
 Jeder Eintrag in dieser Tabelle umfasst:
 - einen normierten ISO-Sprachcode (z.B. la, de)
@@ -369,47 +366,50 @@ Diese zentral gepflegte Tabelle gewährleistet Konsistenz bei der Verwendung von
 
 ### Orte
 
-Die Tabelle Orte dient der Erfassung geographischer Bezeichnungen auf Grundlage von Normdaten. Sie bildet die Grundlage für die strukturierte Verknüpfung aller ortsbezogenen Angaben im System – etwa bei Entstehungsangaben oder Provenienzen.
+Die Tabelle [`places`](tabellen.md#places) dient der Erfassung geographischer Bezeichnungen auf Grundlage von Normdaten. Sie bildet die Grundlage für die strukturierte Verknüpfung aller ortsbezogenen Angaben im System – etwa bei Entstehungsangaben oder Provenienzen.
 
-Die Einträge in der Ortstabelle werden möglichst aus der Gemeinsamen Normdatei (GND) übernommen und enthalten mindestens:
-- den GND-Identifier,
-- den normierten Ortsnamen,
-- bei Bedarf geographische Koordinaten (zur Visualisierung oder Analyse).
+Die Einträge in der Ortstabelle werden möglichst aus der Gemeinsamen Normdatei (GND) übernommen und enthalten:
+- `gnd_number`: den GND-Identifier (optional)
+- `name`: den normierten Ortsnamen
+- `lat` und `lon`: geographische Koordinaten (optionale numerische Angaben für Visualisierung oder Analyse)
+- `type`: Kategorisierung des Orts (z.B. `place`, `settlement`, `monastery`)
 
 ### Institutionen
 
-Die Tabelle `institutions` erfasst Körperschaften, die im Zusammenhang mit Handschriften eine Rolle spielen. Auch diese Einträge werden bevorzugt aus der GND übernommen.
+Die Tabelle [`institutions`](tabellen.md#institutions) erfasst Körperschaften, die im Zusammenhang mit Handschriften eine Rolle spielen. Auch diese Einträge werden bevorzugt aus der GND übernommen.
 
-Jede Institution ist mit mindestens folgenden Informationen hinterlegt:
-- Name der Institution (normiert nach GND),
-- GND-Identifier,
-- optional: Ort (als Verknüpfung zur Ortstabelle),
+Jede Institution ist mit folgenden Informationen hinterlegt:
+- `name`: Name der Institution (normiert nach GND, optional falls in Aufbereitung)
+- `gnd_number`: GND-Identifier (optional)
+- `lat` und `lon`: Geographische Koordinaten (soweit bekannt)
+- `type`: Kategorisierung der Institution (z.B. Archiv, Bibliothek, Orden)
 
 Ein Teil der Institutionen ist bisher in der alten `personen`-Tabelle als juristische Person mitgeführt worden – etwa bei Buchmalern mit Angabe einer Klosterwerkstatt. Diese Einträge werden im Zuge der Neustrukturierung aus der bisherigen Tabelle herausgelöst und als eigenständige Institutionen erfasst. Damit wird eine klare Trennung zwischen natürlichen und juristischen Personen etabliert.
 
 Institutionen können mit verschiedenen Datentypen in Beziehung gesetzt werden – z.B. als Provenienzstellen, Aufbewahrungsorte, Herausgeber, Werkstätten oder Träger bestimmter Funktionen in der Überlieferungsgeschichte.
 
-### Iconclass 
+### Iconclass
 
-Die Tabelle `iconclasses` enthält die von Iconclass definierten Bildkategorien, die der ikonographischen Erschließung dienen. Jeder Eintrag besteht mindestens aus dem Iconclass-Code und der zugehörigen Bezeichnung. Optional kann eine Verknüpfung zu einer übergeordneten Kategorie hergestellt werden, um die hierarchische Struktur des Iconclass-Systems abzubilden. Die Verbindung zu konkreten Handschriftenteilen erfolgt über eine Zwischentabelle, sodass einzelne Bildthemen präzise und mehrfach zugeordnet werden können. Dadurch wird eine systematische Auswertung ikonographischer Inhalte innerhalb der Datenbank möglich.
+Die Tabelle [`iconclasses`](tabellen.md#iconclasses) enthält die von Iconclass definierten Bildkategorien, die der ikonographischen Erschließung dienen. Jeder Eintrag besteht mindestens aus dem Iconclass-Code und der zugehörigen Bezeichnung. Optional kann eine Verknüpfung zu einer übergeordneten Kategorie hergestellt werden, um die hierarchische Struktur des Iconclass-Systems abzubilden. Die Verbindung zu konkreten Handschriftenteilen erfolgt über eine Zwischentabelle, sodass einzelne Bildthemen präzise und mehrfach zugeordnet werden können. Dadurch wird eine systematische Auswertung ikonographischer Inhalte innerhalb der Datenbank möglich.
 
 ## Strukturelle Gruppierung und Kontext
 
 ### Handschriftensammlungen
 
-Die Tabelle der Sammlungen dient der strukturierten Erfassung einzelner Bestände innerhalb einer Institution, insbesondere dann, wenn diese Institution mehrere getrennt verwaltete oder historisch gewachsene Einheiten umfasst – etwa eine Stiftsbibliothek und ein Stiftsarchiv.
+Die Tabelle [`collections`](tabellen.md#collections) dient der strukturierten Erfassung einzelner Bestände innerhalb einer Institution, insbesondere dann, wenn diese Institution mehrere getrennt verwaltete oder historisch gewachsene Einheiten umfasst – etwa eine Stiftsbibliothek und ein Stiftsarchiv.
 
 Im neuen Datenmodell sind Sammlungen einer Institution untergeordnet, d.h. jede Sammlung verweist auf genau eine übergeordnete Institution. Der bisher zur Sammlung gehörende Bibliothekscode (z.B. AT5000) wird stattdessen der Institution zugewiesen. Diese Trennung erlaubt es, inhaltlich oder verwaltungstechnisch getrennte Bestände innerhalb derselben Institution differenziert zu erfassen, ohne neue Codes einführen zu müssen. Dadurch lassen sich etwa die Stiftsbibliothek und das Stiftsarchiv von Klosterneuburg getrennt darstellen, obwohl sie unter demselben Institutionscode zusammengeführt sind.
 
 Jede Sammlung umfasst die folgenden Informationen:
-- Titel der Sammlung.
-- Kontaktdaten: eine zentrale oder bestandsbezogene E-Mail-Adresse.
-- Webseite: Link zur offiziellen Seite der Sammlung oder eines entsprechenden Informationsangebots.
-- Beschreibung: Freitextfeld für weiterführende Informationen zur Sammlungsgeschichte, inhaltlichen Ausrichtung oder Besonderheiten.
+- `code`: Sammlungscode (z.B. AT1000)
+- `name`: Titel der Sammlung
+- `email`: Zentrale oder bestandsbezogene E-Mail-Adresse (nullable)
+- `website`: Link zur offiziellen Seite der Sammlung (nullable)
+- `description`: Freitextfeld für weiterführende Informationen zur Sammlungsgeschichte, inhaltlichen Ausrichtung oder Besonderheiten (nullable)
 
 ### Sachgruppen
 
-Zur inhaltlichen Strukturierung und thematischen Erschließung des Gesamtbestands können Handschriften künftig sammlungsübergreifend Gruppen zugewiesen werden. Diese sogenannten Sachgruppen dienen der Klassifikation nach thematischen, funktionalen oder typologischen Kriterien – etwa „Missale“, „Kirchenreformen im 15. Jahrhundert“ oder „Textzeugen des Thomas von Aquin“.
+Zur inhaltlichen Strukturierung und thematischen Erschließung des Gesamtbestands können Handschriften künftig sammlungsübergreifend Gruppen zugewiesen werden. Diese sogenannten Sachgruppen dienen der Klassifikation nach thematischen, funktionalen oder typologischen Kriterien – etwa „Missale", „Kirchenreformen im 15. Jahrhundert" oder „Textzeugen des Thomas von Aquin".
 
 Technisch erfolgt die Umsetzung über eine eigene Tabelle mit frei definierbaren Titeln und optionalen Beschreibungen. Die Verknüpfung zwischen Handschrift und Gruppe wird über eine separate Zwischentabelle abgebildet, die eine n:m-Beziehung ermöglicht: Eine Handschrift kann mehreren Gruppen zugeordnet sein, und jede Gruppe kann beliebig viele Handschriften enthalten.
 
@@ -419,14 +419,14 @@ Diese Struktur erlaubt es, Sammlungsgrenzen zu überschreiten, spezifische Forsc
 
 ### Personenzuordnungen
 
-Die Tabelle der Personenzuordnungen ermöglicht die strukturierte Verknüpfung von Personen mit verschiedenen Entitäten im System. Sie bildet damit das zentrale Bindeglied zwischen der Personentabelle und allen Rollen, die Personen im handschriftlichen Kontext einnehmen können.
+Die Tabelle [`person_attributions`](tabellen.md#person_attributions) ermöglicht die strukturierte Verknüpfung von Personen mit verschiedenen Entitäten im System. Sie bildet damit das zentrale Bindeglied zwischen der Personentabelle und allen Rollen, die Personen im handschriftlichen Kontext einnehmen können.
 
 Zuordnungen sind durch folgende Elemente definiert:
-- die verknüpfte Entität (z.B. Teil, Schrift),
-- der verknüpfte Personeneintrag (aus der zentralen Personen-Tabelle),
-- eine Funktionsbezeichnung (z.B. Schreiber, Buchmaler) – geführt als Enum,
-- optional: ein Unsicherheitsindikator (z.B. Boolean-Feld „fraglich“),
-- optional: ein Kommentarfeld für weitere Informationen.
+- `attributable_type` und `attributable_id`: die verknüpfte Entität (z.B. Teil, Schrift) über polymorphe Beziehung
+- `person_id`: der verknüpfte Personeneintrag (aus der zentralen Personen-Tabelle)
+- `role`: eine Funktionsbezeichnung (z.B. Schreiber, Buchmaler) – geführt als TEXT-Feld
+- `is_certain`: ein Unsicherheitsindikator (BOOLEAN)
+- `comments`: ein Kommentarfeld für weitere Informationen (nullable)
 
 Die Personenzuordnungen sind polymorph aufgebaut: Eine Person kann mit beliebig vielen Objekten verknüpft sein, und jede Entität kann mit mehreren Personen in unterschiedlichen Rollen assoziiert werden.
 
@@ -436,32 +436,33 @@ Die Tabelle der Materialzuordnungen dient der flexiblen Erfassung von Beschreibs
 
 ### Handschrift-Sprachen-Zuordnungen
 
-Die Zuordnung von Sprachen zu Handschriften erfolgt über eine eigene Zwischentabelle. Diese bildet eine n:m-Beziehung zwischen den Entitäten und der zentralen Sprachentabelle `languages` ab und ersetzt damit die bisherige Praxis, Sprachangaben als verdichteten Buchstabencode in einem Textfeld der Handschriftentabelle zu speichern (z.B. „LD“ für Latein und Deutsch).
+Die Zuordnung von Sprachen zu Handschriften erfolgt über die Zwischentabelle [`language_manuscript`](tabellen.md#language_manuscript). Diese bildet eine n:m-Beziehung zwischen Handschriften und Spracheinträgen ab und ersetzt damit die bisherige Praxis, Sprachangaben als verdichteten Buchstabencode in einem Textfeld der Handschriftentabelle zu speichern (z.B. „LD" für Latein und Deutsch).
 
 Jede Sprachenzuordnung dokumentiert:
-- die referenzierte Handschrift
-- die zugeordnete Sprache aus der Sprachentabelle
+- `manuscript_id`: die referenzierte Handschrift
+- `language_id`: die zugeordnete Sprache aus dem kontrollierten Sprachvokabular
 
-### Literatur–Sprachen Zwischentabelle
+### Literatur-Sprachen-Zuordnungen
 
-Die Zuordnung von Sprachen zu Handschriften erfolgt über eine eigene Zwischentabelle. Diese bildet eine n:m-Beziehung zwischen den Entitäten und der zentralen Sprachentabelle `languages` ab und ersetzt damit die bisherige Praxis, Sprachangaben als verdichteten Buchstabencode in einem Textfeld der Handschriftentabelle zu speichern (z.B. „LD“ für Latein und Deutsch).
+Die Zuordnung von Sprachen zu Literatureinträgen erfolgt über die Zwischentabelle [`language_literature`](tabellen.md#language_literature). Diese bildet eine n:m-Beziehung zwischen Publikationen und Spracheinträgen ab.
 
 Jede Sprachenzuordnung dokumentiert:
-- die referenzierte Handschrift
-- die zugeordnete Sprache aus der Sprachentabelle
+- `literature_id`: die referenzierte Publikation
+- `language_id`: die zugeordnete Sprache aus dem kontrollierten Sprachvokabular
 
 ### Handschrift-Literatur-Zuordnungen
 
-Die Zwischentabelle der Literaturzuordnungen bildet eine n:m-Verknüpfung zwischen Handschriften und Einträgen in der zentralen Publikationstabelle. Sie ermöglicht die präzise Angabe, welche Literatur sich auf welche Handschrift bezieht.
+Die Zwischentabelle [`references`](tabellen.md#references) bildet eine polymorphe n:m-Verknüpfung zwischen verschiedenen Entitäten (Handschriften, Initia, etc.) und Einträgen in der zentralen Publikationstabelle. Sie ermöglicht die präzise Angabe, welche Literatur sich auf welche Entität bezieht.
 
-Neben der reinen Verknüpfung können zusätzliche Informationen erfasst werden, darunter:
-- die Seitenzahl oder der Seitenbereich, auf den sich der Verweis bezieht,
-- ein Direktlink zur digitalen Version der Quelle (sofern vorhanden).
+Die Tabelle enthält:
+- `referencable_type` und `referencable_id`: polymorphe Beziehung zur referenzierten Entität
+- `literature_id`: Verweis auf den Literatureintrag
+- `url`: optionaler Direktlink zur digitalen Version der Quelle (nullable)
 
-### Handschrift–Sachgruppen Zwischentabelle
+### Handschrift-Sachgruppen-Zuordnung
 
 Die Zuordnung von Handschriften zu Sachgruppen erfolgt über eine eigene Zwischentabelle, die eine n:m-Beziehung zwischen den beiden Entitäten abbildet. Jede Zeile der Tabelle verbindet eine Handschrift mit einer Sachgruppe und ermöglicht so eine flexible, sammlungsübergreifende Gruppierung.
 
-### Iconclass-Zuordnung 
+### Iconclass-Zuordnung
 
-Die Zwischentabelle `iconclass_parts` bildet eine n:m-Beziehung zwischen Handschriftenteilen und Einträgen in der Iconclass-Tabelle. Sie ermöglicht es, einem Teil mehrere ikonographische Kategorien zuzuweisen und gleichzeitig eine präzise Lokalisierung innerhalb des Objekts vorzunehmen – etwa durch die Angabe eines Folios oder Seitenbereichs. Zusätzlich kann ein Kommentarfeld genutzt werden, um nähere Informationen zur Darstellung oder zur Interpretation des Motivs zu hinterlegen. 
+Die Zwischentabelle [`iconclass_parts`](tabellen.md#iconclass_parts) bildet eine n:m-Beziehung zwischen Handschriftenteilen und Einträgen in der Iconclass-Tabelle. Sie ermöglicht es, einem Teil mehrere ikonographische Kategorien zuzuweisen und gleichzeitig eine präzise Lokalisierung innerhalb des Objekts vorzunehmen – etwa durch die Angabe eines Folios oder Seitenbereichs. Zusätzlich kann ein Kommentarfeld genutzt werden, um nähere Informationen zur Darstellung oder zur Interpretation des Motivs zu hinterlegen. 
