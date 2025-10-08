@@ -176,10 +176,10 @@
 | Feldname | SQL-Datentyp | Index | Referenziert | Kommentar | TEI-mapping |
 |----------|--------------|-------|--------------|-----------|-------------|
 | id | INTEGER | PRIMARY | – | Primärschlüssel | – |
-| part_id | INTEGER | INDEX | [parts](tabellen.md#parts) | Verknüpfter Handschriftenteil | msContents->msItem->filiation->ref @target |
+| part_id | INTEGER | INDEX | [parts](tabellen.md#parts) | Verknüpfter Handschriftenteil | - |
 | iconclass_id | INTEGER | INDEX | [iconclasses](tabellen.md#iconclasses) | Verknüpfter Iconclass-Eintrag | – |
 | folio | TEXT | – | – | Blätter-/Seitenangabe zur Lokalisierung | – |
-| comments | TEXT | – | – | Freitextkommentar | note |
+| comments | TEXT | – | – | Freitextkommentar | - |
 | position | INTEGER | – | – | Reihenfolge innerhalb des Teils | – |
 
 ## initia
