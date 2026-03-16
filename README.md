@@ -2,11 +2,13 @@
 
 Diese Dokumentation fasst die laufende Neugestaltung des Datenmodells von *manuscripta.at* zusammen. Sie dient der Beschreibung der grundlegenden Struktur, der modellierten Entitäten sowie der zugrunde liegenden konzeptionellen Überlegungen.
 
-Die Dokumentation gliedert sich derzeit in drei Bereiche:
+Die Dokumentation gliedert sich derzeit in fünf Bereiche:
 
 - [**Technische Konventionen**](./technische-konventionen.md): Hinweise zu Modellierungsprinzipien und Namenskonventionen
-- [**Modellbeschreibung**](./datenmodellierung.md): Überblick über Datentypen, Beziehungen und funktionale Konzepte  
+- [**Modellbeschreibung**](./datenmodellierung.md): Überblick über Datentypen, Beziehungen und funktionale Konzepte
+- [**Datenbankschema**](./datenbankschema.md): Visuelle Übersicht der Tabellenstruktur als ER-Diagramme
 - [**Tabellenübersicht**](./tabellen.md): Technische Darstellung der Tabellenstruktur mit Felddefinitionen und Datentypen
+- [**TEI-Mapping**](./tei-mapping.md): Statische Referenz zur Abbildung von Datenbankfeldern auf TEI P5
 
 Die Dokumente werden fortlaufend ergänzt und überarbeitet. Ziel ist es, den Entwicklungsstand transparent zu dokumentieren und die interne wie externe Zusammenarbeit zu erleichtern.
 

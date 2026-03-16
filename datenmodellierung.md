@@ -58,9 +58,9 @@ Für Bearbeiter:innen und Benutzer:innen ergibt sich daraus keine Änderung im U
 
 #### Sprache
 
-Sprachangaben werden über eine Zwischentabelle [`language_manuscript`](tabellen.md#language_manuscript) verwaltet. Diese Tabelle bildet eine n:m-Beziehung zwischen Handschriften und Spracheinträgen ab. Die Spracheinträge selbst werden über eine ID referenziert, die auf eine separate Sprachtabelle verweist (diese wird außerhalb des CSV-Exports verwaltet).
+Sprachangaben werden über eine Zwischentabelle [`language_manuscript`](tabellen.md#language_manuscript) verwaltet. Diese Tabelle bildet eine n:m-Beziehung zwischen Handschriften und Spracheinträgen ab. Als Schlüssel wird der ISO-639-Sprachcode direkt verwendet, da Sprachen keine eigene numerische ID benötigen. Die Tabelle [`languages`](tabellen.md#languages) enthält die zugelassenen Sprachcodes als kontrolliertes Vokabular.
 
-Die Zwischentabelle ermöglicht die Verknüpfung einer Handschrift mit mehreren Spracheinträgen und löst damit die bisherige Zeichenkettenstruktur ab.
+Diese Struktur ermöglicht die Verknüpfung einer Handschrift mit mehreren Sprachen und löst damit die bisherige Zeichenkettenstruktur ab (z. B. „LD" für Latein und Deutsch).
 
 #### Überlieferungsform
 
@@ -215,12 +215,9 @@ Die Verwendung von Makulatur oder eingebundenen Fragmenten wird über ein Boolea
 
 Im neuen Datenmodell werden Digitalisate nicht mehr systemintern gespeichert oder verwaltet. Stattdessen erfolgt die Einbindung vollständig über externe IIIF-Schnittstellen (International Image Interoperability Framework). Diese Architektur erlaubt es, Digitalisate unabhängig von ihrer physischen Speicherung dynamisch in die Oberfläche einzubinden.
 
-Aus diesem Grund entfällt die Notwendigkeit einer eigenen komplexen Datenstruktur zur Abbildung von Bildpfaden oder Metadaten. Stattdessen gibt es eine reduzierte, strukturierte Tabelle, die lediglich der Verknüpfung von IIIF-Manifests mit Handschriften dient.
+Die Tabelle [`digital_copies`](tabellen.md#digital_copies) verknüpft IIIF-Manifests mit Handschriften und hält grundlegende Metadaten wie Lizenz und Bildnachweis fest. Eine Handschrift kann mehrere Digitalisate haben.
 
-Jeder Eintrag in der Digitalisat-Tabelle enthält:
-- den IIIF-Manifest-Link, über den das vollständige Digitalisat eingebunden wird,
-- eine Verknüpfung zur jeweiligen Handschrift,
-- einen statischen Direktlink zur ersten Seite (z.B. 001r), der zur Erzeugung eines Vorschaubildes (Thumbnail) verwendet wird.
+Zusätzlich werden die Einzelseiten (Canvases) eines Digitalisats in der Tabelle [`digital_copy_pages`](tabellen.md#digital_copy_pages) lokal gespeichert. Das ermöglicht es, kodikologische Teile und Initien direkt mit einer bestimmten Seite im Digitalisat zu verknüpfen, ohne bei jeder Anfrage das vollständige IIIF-Manifest auswerten zu müssen. Die Seitendaten werden aus dem Manifest importiert und bei Bedarf aktualisiert.
 
 ### Literatur/Kataloge
 
@@ -390,30 +387,27 @@ Institutionen können mit verschiedenen Datentypen in Beziehung gesetzt werden �
 
 ### Iconclass
 
-Die Tabelle [`iconclasses`](tabellen.md#iconclasses) enthält die von Iconclass definierten Bildkategorien, die der ikonographischen Erschließung dienen. Jeder Eintrag besteht mindestens aus dem Iconclass-Code und der zugehörigen Bezeichnung. Optional kann eine Verknüpfung zu einer übergeordneten Kategorie hergestellt werden, um die hierarchische Struktur des Iconclass-Systems abzubilden. Die Verbindung zu konkreten Handschriftenteilen erfolgt über eine Zwischentabelle, sodass einzelne Bildthemen präzise und mehrfach zugeordnet werden können. Dadurch wird eine systematische Auswertung ikonographischer Inhalte innerhalb der Datenbank möglich.
+Das Referenzvokabular des Iconclass-Systems ist in der Tabelle [`iconclass_terms`](tabellen.md#iconclass_terms) gespeichert. Jeder Eintrag besteht aus einem Iconclass-Code und zweisprachigen Bezeichnungen (Deutsch und Englisch). Optional kann eine Verknüpfung zu einer übergeordneten Kategorie hergestellt werden, um die hierarchische Struktur des Systems abzubilden. Die ikonographische Beschreibung von Handschriftenteilen erfolgt derzeit über die Freitextfelder `decoration_description` und `iconographic_program` in der Tabelle [`parts`](tabellen.md#parts).
+
+### Glossar
+
+Die Tabelle [`glossary_terms`](tabellen.md#glossary_terms) enthält zweisprachige Erklärungen zu fachspezifischen Begriffen, die in der Benutzeroberfläche und der Dokumentation verwendet werden.
 
 ## Strukturelle Gruppierung und Kontext
 
 ### Handschriftensammlungen
 
-Die Tabelle [`collections`](tabellen.md#collections) dient der strukturierten Erfassung einzelner Bestände innerhalb einer Institution, insbesondere dann, wenn diese Institution mehrere getrennt verwaltete oder historisch gewachsene Einheiten umfasst – etwa eine Stiftsbibliothek und ein Stiftsarchiv.
+Die Tabelle [`collections`](tabellen.md#collections) dient der strukturierten Erfassung einzelner Bestände innerhalb einer Institution, insbesondere dann, wenn diese Institution mehrere getrennt verwaltete oder historisch gewachsene Einheiten umfasst, etwa eine Stiftsbibliothek und ein Stiftsarchiv.
 
-Im neuen Datenmodell sind Sammlungen einer Institution untergeordnet, d.h. jede Sammlung verweist auf genau eine übergeordnete Institution. Der bisher zur Sammlung gehörende Bibliothekscode (z.B. AT5000) wird stattdessen der Institution zugewiesen. Diese Trennung erlaubt es, inhaltlich oder verwaltungstechnisch getrennte Bestände innerhalb derselben Institution differenziert zu erfassen, ohne neue Codes einführen zu müssen. Dadurch lassen sich etwa die Stiftsbibliothek und das Stiftsarchiv von Klosterneuburg getrennt darstellen, obwohl sie unter demselben Institutionscode zusammengeführt sind.
+Sammlungen sind einer Institution untergeordnet, d.h. jede Sammlung verweist auf genau eine übergeordnete Institution. Der Bibliothekscode (z.B. AT5000) ist der Institution zugewiesen, nicht der Sammlung. Diese Trennung erlaubt es, verwaltungstechnisch getrennte Bestände innerhalb derselben Institution differenziert zu erfassen.
 
-Jede Sammlung umfasst die folgenden Informationen:
-- `code`: Sammlungscode (z.B. AT1000)
-- `name`: Titel der Sammlung
-- `email`: Zentrale oder bestandsbezogene E-Mail-Adresse (nullable)
-- `website`: Link zur offiziellen Seite der Sammlung (nullable)
-- `description`: Freitextfeld für weiterführende Informationen zur Sammlungsgeschichte, inhaltlichen Ausrichtung oder Besonderheiten (nullable)
+### Ergänzende Sammlungszuordnungen
 
-### Sachgruppen
+Manche Handschriften sind in mehreren Sammlungen verzeichnet, etwa weil sie nach einem Sammlungswechsel unter einer neuen Signatur geführt werden. Die Tabelle [`collection_complements`](tabellen.md#collection_complements) hält diese zusätzlichen Zuordnungen fest, einschließlich der früheren Signatur und einer optionalen Zeitangabe.
 
-Zur inhaltlichen Strukturierung und thematischen Erschließung des Gesamtbestands können Handschriften künftig sammlungsübergreifend Gruppen zugewiesen werden. Diese sogenannten Sachgruppen dienen der Klassifikation nach thematischen, funktionalen oder typologischen Kriterien – etwa „Missale", „Kirchenreformen im 15. Jahrhundert" oder „Textzeugen des Thomas von Aquin".
+### Redaktionelle Zuständigkeiten
 
-Technisch erfolgt die Umsetzung über eine eigene Tabelle mit frei definierbaren Titeln und optionalen Beschreibungen. Die Verknüpfung zwischen Handschrift und Gruppe wird über eine separate Zwischentabelle abgebildet, die eine n:m-Beziehung ermöglicht: Eine Handschrift kann mehreren Gruppen zugeordnet sein, und jede Gruppe kann beliebig viele Handschriften enthalten.
-
-Diese Struktur erlaubt es, Sammlungsgrenzen zu überschreiten, spezifische Forschungsperspektiven abzubilden und gezielte Such- oder Filteroptionen bereitzustellen.
+Die Tabelle [`manuscript_authors`](tabellen.md#manuscript_authors) dokumentiert, wer eine Handschriftenbeschreibung verfasst oder bearbeitet hat. Diese Angaben werden in der Benutzeroberfläche transparent ausgewiesen, um Autor:innenschaft und Verantwortlichkeiten nachvollziehbar zu machen.
 
 ## Beziehungs- und Zuordnungstabellen
 
@@ -444,10 +438,10 @@ Jede Sprachenzuordnung dokumentiert:
 
 ### Literatur-Sprachen-Zuordnungen
 
-Die Zuordnung von Sprachen zu Literatureinträgen erfolgt über die Zwischentabelle [`language_literature`](tabellen.md#language_literature). Diese bildet eine n:m-Beziehung zwischen Publikationen und Spracheinträgen ab.
+Die Zuordnung von Sprachen zu Publikationen erfolgt über die Zwischentabelle [`language_publications`](tabellen.md#language_publications). Diese bildet eine n:m-Beziehung zwischen Publikationen und Spracheinträgen ab.
 
 Jede Sprachenzuordnung dokumentiert:
-- `literature_id`: die referenzierte Publikation
+- `publication_id`: die referenzierte Publikation
 - `language_id`: die zugeordnete Sprache aus dem kontrollierten Sprachvokabular
 
 ### Handschrift-Literatur-Zuordnungen
@@ -456,13 +450,17 @@ Die Zwischentabelle [`references`](tabellen.md#references) bildet eine polymorph
 
 Die Tabelle enthält:
 - `referencable_type` und `referencable_id`: polymorphe Beziehung zur referenzierten Entität
-- `literature_id`: Verweis auf den Literatureintrag
+- `publication_id`: Verweis auf den Publikationseintrag
 - `url`: optionaler Direktlink zur digitalen Version der Quelle (nullable)
 
-### Handschrift-Sachgruppen-Zuordnung
+### Externe Ressourcen
 
-Die Zuordnung von Handschriften zu Sachgruppen erfolgt über eine eigene Zwischentabelle, die eine n:m-Beziehung zwischen den beiden Entitäten abbildet. Jede Zeile der Tabelle verbindet eine Handschrift mit einer Sachgruppe und ermöglicht so eine flexible, sammlungsübergreifende Gruppierung.
+Die Tabelle [`resources`](tabellen.md#resources) speichert externe Identifier und Links, die mit einer Entität verknüpft sind, etwa GND-URIs, VIAF-IDs oder Einträge in anderen Fachdatenbanken. Die Tabelle ist polymorph aufgebaut und kann mit beliebigen Entitäten verknüpft werden.
 
-### Iconclass-Zuordnung
+### Listen
 
-Die Zwischentabelle [`iconclass_parts`](tabellen.md#iconclass_parts) bildet eine n:m-Beziehung zwischen Handschriftenteilen und Einträgen in der Iconclass-Tabelle. Sie ermöglicht es, einem Teil mehrere ikonographische Kategorien zuzuweisen und gleichzeitig eine präzise Lokalisierung innerhalb des Objekts vorzunehmen – etwa durch die Angabe eines Folios oder Seitenbereichs. Zusätzlich kann ein Kommentarfeld genutzt werden, um nähere Informationen zur Darstellung oder zur Interpretation des Motivs zu hinterlegen. 
+Benutzerinnen und Benutzer können Handschriften, Digitalisate und einzelne Seiten in eigenen Listen sammeln. Die Tabelle [`lists`](tabellen.md#lists) verwaltet die Listen selbst, [`list_items`](tabellen.md#list_items) die einzelnen Einträge. Listen können als privat oder öffentlich markiert werden; öffentliche Listen sind über einen eigenen Schlüssel teilbar.
+
+### Agenten und Sammlungsverantwortliche
+
+Die Tabelle [`agents`](tabellen.md#agents) erfasst Personen oder Körperschaften, die in institutioneller Funktion mit einer Sammlung verbunden sind, etwa als Herausgeber oder Trägerinstitution. Die Verknüpfung mit einer Sammlung und die jeweilige Rolle werden in [`agent_collection`](tabellen.md#agent_collection) gespeichert.
